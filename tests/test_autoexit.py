@@ -23,7 +23,7 @@ TITLE = "AFA_E2E_TEST"
 
 def make_cfg(auto_exit):
     cfg = dict(afa.DEFAULT_CONFIG)
-    cfg.update({"window_title": TITLE, "in_level_guard": False,
+    cfg.update({"window_title": TITLE, "in_level_guard": False, "game_process": "",
                 "window_poll_seconds": 0.5, "auto_exit": auto_exit,
                 "bindings": {k: "" for k in afa.DEFAULT_BINDINGS}})
     return cfg

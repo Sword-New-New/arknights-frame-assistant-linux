@@ -32,7 +32,7 @@ def main():
 
     tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
     base_cfg = dict(afa.DEFAULT_CONFIG)
-    base_cfg.update({"window_title": TITLE, "in_level_guard": False,
+    base_cfg.update({"window_title": TITLE, "in_level_guard": False, "game_process": "",
                      "window_poll_seconds": 0.5,
                      "bindings": {k: ("e" if k == "one_click_skill" else "")
                                   for k in afa.DEFAULT_BINDINGS}})

@@ -207,11 +207,14 @@ class XHelper:
     # -- 窗口 --
 
     def game_pids(self):
-        """游戏进程的 Linux pid 集合（wine 进程 cmdline 含游戏 exe 名）。"""
+        """游戏进程的 Linux pid 集合（wine 进程 cmdline 含游戏 exe 名）。
+
+        game_process 为空表示未启用进程校验，返回 None。
+        """
         exe = self.cfg.get("game_process") or ""
-        pids = set()
         if not exe:
-            return pids
+            return None
+        pids = set()
         for p in os.listdir("/proc"):
             if not p.isdigit():
                 continue
@@ -241,6 +244,11 @@ class XHelper:
         with self.lock:
             wanted = self.cfg["window_title"]
             gpids = self.game_pids()
+            if gpids is not None and not gpids:
+                # 启用了进程校验但游戏进程不在运行：同名窗口全是冒名顶替者
+                # （启动器会改名为「明日方舟」、浏览器标签也含游戏名），
+                # 判定为无游戏窗口——这也是 auto_exit 判定"游戏已退出"的依据。
+                return []
             out = []
             seen = set()
             frontier = [self.root]

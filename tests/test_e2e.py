@@ -65,6 +65,7 @@ def main():
 
     cfg = dict(afa.DEFAULT_CONFIG)
     cfg["window_title"] = TITLE
+    cfg["game_process"] = ""
     cfg["in_level_guard"] = False
     cfg["window_poll_seconds"] = 0.5
     cfg["bindings"] = {k: ("e" if k == "one_click_skill" else "") for k in cfg["bindings"]}
