@@ -138,6 +138,36 @@ class App:
 
     # -- 界面构建 --
 
+    def _make_sidebar_photo(self):
+        """右侧美术位：assets/ 目录放了图片（推荐 sidebar.png，也认 png/jpg/gif/webp/bmp）
+        就显示在键位表右侧；没有素材或加载失败则维持原布局。多文件取排序第一个。"""
+        try:
+            from PIL import Image, ImageTk
+        except ImportError:
+            return None
+        assets = os.path.join(BASE_DIR, "assets")
+        if not os.path.isdir(assets):
+            return None
+        files = sorted(f for f in os.listdir(assets)
+                       if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp")))
+        if not files:
+            return None
+        try:
+            from PIL import Image
+            img = Image.open(os.path.join(assets, files[0])).convert("RGBA")
+            img.thumbnail((460, 620), Image.LANCZOS)
+            photo = ImageTk.PhotoImage(img)
+            self._sidebar_refs = [photo]   # 防 GC
+            return photo
+        except Exception as e:
+            print(f"素材加载失败（{files[0]}）：{e}", file=sys.stderr)
+            return None
+
+    def _build_sidebar(self, wrap, sidebar):
+        if sidebar:
+            lbl = ttk.Label(wrap, image=sidebar, anchor="center")
+            lbl.pack(side="right", padx=10, pady=10)
+
     def _build(self):
         top = ttk.Frame(self.root, padding=(8, 6))
         top.pack(fill="x")
@@ -150,23 +180,30 @@ class App:
         nb = ttk.Notebook(self.root)
         nb.pack(fill="both", expand=True, padx=8, pady=4)
 
+        sidebar = self._make_sidebar_photo()
+
+        def new_tab(text):
+            wrap = ttk.Frame(nb)
+            nb.add(wrap, text=text)
+            self._build_sidebar(wrap, sidebar)   # 先占右侧，表格再填充剩余
+            table = ttk.Frame(wrap, padding=8)
+            table.pack(side="left", fill="both", expand=True)
+            return table
+
         groups = {}
         for name in ACTION_META:
             g = ACTION_META[name][0]
             groups.setdefault(g, []).append(name)
         for gi, g in enumerate(("常规作战", "快捷操作")):
-            frame = ttk.Frame(nb, padding=8)
-            nb.add(frame, text=g)
+            frame = new_tab(g)
             for row, name in enumerate(groups[g]):
                 self._binding_row(frame, row, "binding", name)
-        frame = ttk.Frame(nb, padding=8)
-        nb.add(frame, text="游戏功能键")
+        frame = new_tab("游戏功能键")
         ttk.Label(frame, text="AFA 会自动读游戏内按键；本版请与游戏内设置保持一致（改过游戏键位务必同步）",
                   foreground="#666").grid(row=0, column=0, columnspan=3, sticky="w")
         for row, name in enumerate(GAME_KEY_META):
             self._binding_row(frame, row + 1, "game_key", name)
-        frame = ttk.Frame(nb, padding=8)
-        nb.add(frame, text="延迟与守卫")
+        frame = new_tab("延迟与守卫")
         self._delay_tab(frame)
 
         bottom = ttk.Frame(self.root, padding=8)
