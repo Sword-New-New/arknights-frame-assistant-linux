@@ -277,6 +277,12 @@ class XHelper:
                 if not frontier:
                     break
             out.sort(key=lambda c: (not c["mapped"], -(c["w"] * c["h"])))
+            # 分层：有 pid 匹配的候选时，排除 pid 未知的窗口（如改名为游戏标题的
+            # 启动器窗口——无 _NET_WM_PID、会持有焦点，焦点优先启发式曾误选它）
+            if gpids:
+                matched = [c for c in out if c["pid"] in gpids]
+                if matched:
+                    out = matched
             return out
 
     def find_game_window(self):
