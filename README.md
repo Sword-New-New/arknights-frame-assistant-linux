@@ -33,7 +33,8 @@
 
 **测试**：`python3 tests/test_race.py`（触发状态机回归）、`python3 tests/test_e2e.py`（完整流水线端到端，含连按 6 次不衰减回归）、`python3 tests/test_reload.py`（配置热重载回归）。
 
-- 与游戏无启动顺序要求：游戏没开时工具会等待，窗口出现后自动挂载热键；游戏关闭后自动解除。
+- 与游戏无启动顺序要求：游戏没开时工具会等待，窗口出现后自动挂载热键。
+- **游戏退出后守护自动退出**（`auto_exit`，默认开启，与 AFA 的 AutoExit 一致，防反作弊建议保持）；游戏没启动过则一直等待，不会误退。
 - 需要 X11 会话（`echo $XDG_SESSION_TYPE` 应为 `x11`；XWayland 下理论可用但未验证）。
 
 ## 默认键位（与 AFA 默认一致，见 `config.json`）
@@ -83,6 +84,6 @@
 - `config.json` — 首次运行自动生成（不入库，含个人键位）
 - `start.sh` — 启动脚本（`gui` 参数打开设置界面）
 - `logs/afa.log` — 运行日志（自动滚动，不入库）
-- `tests/` — 回归测试（竞态状态机、端到端流水线、配置热重载）
+- `tests/` — 回归测试（竞态状态机、端到端流水线、配置热重载、自动退出）
 
 上游 AFA 源码：<https://github.com/CloudTracey/arknights-frame-assistant>（GPL-3.0-only；本仓库的移植规格以该源码为准，需要时可自行克隆对照）。

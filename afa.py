@@ -123,6 +123,7 @@ DEFAULT_CONFIG = {
     "frame_skip_33ms_delay": 30,  # AFA 默认 30（标注"避免一次过两帧"）
     "frame_skip_166ms_delay": 165,
     "in_level_guard": True,       # 关卡守卫：不在关卡内时透传游戏键
+    "auto_exit": True,            # 游戏退出后自动退出守护（AFA AutoExit，防反作弊建议保持开启）
     "hover_operate": True,        # 鼠标悬停游戏窗口（未持焦点）时允许鼠标侧键触发
     "window_poll_seconds": 2.0,
     "guard_poll_ms": 333,
@@ -1096,7 +1097,11 @@ class App:
                 elif not xid and cur:
                     self.guard.game_xid = X.NONE
                     self.cmd_queue.put(("uninstall", None))
-                    log.info("游戏窗口已消失，等待游戏启动…")
+                    if self.cfg.get("auto_exit", True):
+                        log.info("游戏已退出，守护随之退出（auto_exit）")
+                        self._stop.set()
+                    else:
+                        log.info("游戏窗口已消失，等待游戏启动…")
             now = time.monotonic()
             if now - last_guard >= guard_ms:
                 last_guard = now

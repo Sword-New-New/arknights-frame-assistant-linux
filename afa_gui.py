@@ -223,6 +223,9 @@ class App:
         self.hover_var = tk.BooleanVar(value=bool(c["hover_operate"]))
         ttk.Checkbutton(frame, text="鼠标悬停游戏窗口时允许鼠标侧键触发（未持焦点）",
                         variable=self.hover_var).grid(row=base + 1, column=0, columnspan=3, sticky="w")
+        self.autoexit_var = tk.BooleanVar(value=bool(c.get("auto_exit", True)))
+        ttk.Checkbutton(frame, text="游戏退出后自动退出后台守护（防反作弊建议保持开启）",
+                        variable=self.autoexit_var).grid(row=base + 2, column=0, columnspan=3, sticky="w")
         self.title_var = tk.StringVar(value=c["window_title"])
         ttk.Label(frame, text="窗口标题匹配").grid(row=base + 2, column=0, sticky="w")
         ttk.Entry(frame, textvariable=self.title_var, width=16).grid(row=base + 2, column=1, sticky="w")
@@ -350,6 +353,7 @@ class App:
                 return
         self.cfg["in_level_guard"] = bool(self.guard_var.get())
         self.cfg["hover_operate"] = bool(self.hover_var.get())
+        self.cfg["auto_exit"] = bool(self.autoexit_var.get())
         self.cfg["window_title"] = self.title_var.get().strip() or "明日方舟"
         if self._conflicts():
             if not messagebox.askyesno("存在键位冲突",
